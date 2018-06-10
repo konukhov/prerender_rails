@@ -104,7 +104,12 @@ module Rack
         if prerendered_response
           response = build_rack_response_from_prerender(prerendered_response)
           after_render(env, prerendered_response)
-          return response.finish
+          status, headers, body = response.finish
+          return [
+            status,
+            headers.tap { |h| h.delete('transfer-encoding') },
+            body
+          ]
         end
       end
 
